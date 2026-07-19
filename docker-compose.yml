@@ -1,0 +1,72 @@
+version: "3.9"
+
+services:
+  postgres:
+    image: pgvector/pgvector:pg16
+    container_name: ara_postgres
+    environment:
+      POSTGRES_USER: ara
+      POSTGRES_PASSWORD: ara_dev_pw
+      POSTGRES_DB: ara_db
+    ports:
+      - "5433:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ara -d ara_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    container_name: ara_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  ollama:
+    # On the AMD pod, swap this image for: ollama/ollama:rocm
+    # and add: devices: ["/dev/kfd", "/dev/dri"] + group_add: ["video"]
+    image: ollama/ollama:latest
+    container_name: ara_ollama
+    dns:
+      - 8.8.8.8
+      - 1.1.1.1
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_models:/root/.ollama
+  backend:
+    build: ./backend
+    container_name: ara_backend
+    env_file: .env
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+      ollama:
+        condition: service_started
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend/app:/app/app
+
+  frontend:
+    build: ./frontend
+    container_name: ara_frontend
+    depends_on:
+      - backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NEXT_PUBLIC_API_URL=http://localhost:8000
+
+volumes:
+  pgdata:
+  ollama_models:
