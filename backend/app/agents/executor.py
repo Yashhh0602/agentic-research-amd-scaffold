@@ -7,7 +7,7 @@ need an LLM call itself for simple tool dispatch, but may use the small
 model to interpret tool output before handing it to the Synthesizer.
 
 TODO (next pass):
-- Wire real tool calls from app/tools/ (web_search.py, code_exec.py)
+- Wire real tool call for code_exec.py (still placeholder, needs sandboxing)
 - Support parallel tool calls when the plan has independent sub-tasks
   (this matters for the concurrent execution mode / benchmark story)
 - Error handling: a failed tool call shouldn't kill the whole pipeline,
@@ -17,6 +17,7 @@ TODO (next pass):
 from typing import Any, AsyncIterator
 
 from app.agents.base import AgentEvent, AgentResult, BaseAgent, EventType
+from app.tools.web_search import web_search
 
 
 class ExecutorAgent(BaseAgent):
@@ -39,13 +40,21 @@ class ExecutorAgent(BaseAgent):
                 event_type=EventType.TOOL_CALL,
                 detail="web_search",
             )
-            # TODO: replace with real app/tools/web_search.py call
-            tool_outputs.append({"tool": "web_search", "result": "[placeholder web result]"})
-            yield AgentEvent(
-                agent_name=self.name,
-                event_type=EventType.TOOL_RESULT,
-                detail="web_search returned 1 result",
-            )
+            try:
+                results = await web_search(context["query"])
+                tool_outputs.append({"tool": "web_search", "result": results})
+                yield AgentEvent(
+                    agent_name=self.name,
+                    event_type=EventType.TOOL_RESULT,
+                    detail=f"web_search returned {len(results)} result(s)",
+                )
+            except Exception as e:
+                tool_outputs.append({"tool": "web_search", "result": None, "error": str(e)})
+                yield AgentEvent(
+                    agent_name=self.name,
+                    event_type=EventType.ERROR,
+                    detail=f"web_search failed: {e}",
+                )
 
         if plan.get("needs_code_exec"):
             yield AgentEvent(
@@ -53,7 +62,7 @@ class ExecutorAgent(BaseAgent):
                 event_type=EventType.TOOL_CALL,
                 detail="code_exec",
             )
-            # TODO: replace with real app/tools/code_exec.py call
+            # TODO: replace with real app/tools/code_exec.py call (needs sandboxing first)
             tool_outputs.append({"tool": "code_exec", "result": "[placeholder code output]"})
             yield AgentEvent(
                 agent_name=self.name,

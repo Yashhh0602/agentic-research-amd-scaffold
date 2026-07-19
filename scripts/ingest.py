@@ -97,6 +97,23 @@ def main():
 
     total_chunks = 0
     with Session(engine) as session:
+        total_chunks = 0
+    with Session(engine) as session:
+        for url in SOURCES:
+            existing = session.execute(
+                text("SELECT COUNT(*) FROM document_chunks WHERE source = :source"),
+                {"source": url},
+            ).scalar()
+            if existing:
+                print(f"Skipping {url} ({existing} chunks already exist)")
+                continue
+
+            print(f"Fetching {url}")
+            try:
+                page_text = fetch_and_clean(url)
+            except Exception as e:
+                print(f"  FAILED to fetch: {e}")
+                continue
         for url in SOURCES:
             print(f"Fetching {url}")
             try:

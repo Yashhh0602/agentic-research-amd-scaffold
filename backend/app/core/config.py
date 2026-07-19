@@ -30,13 +30,12 @@ class Settings(BaseSettings):
     redis_url: str = "redis://redis:6379/0"
 
     # --- Agent execution ---
-    # "sequential" or "concurrent" — this is the benchmark toggle.
-    # Exposed via API so the frontend can flip it live during a demo.
     default_execution_mode: str = "sequential"
 
     # --- Tools ---
     web_search_enabled: bool = True
     code_exec_enabled: bool = True
+    tavily_api_key: str = ""
 
     # --- Misc ---
     app_env: str = "dev"
