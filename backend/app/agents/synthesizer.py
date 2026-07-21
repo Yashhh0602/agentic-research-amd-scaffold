@@ -1,18 +1,5 @@
 """
 Synthesizer Agent
-
-Job: combine retrieved_chunks + tool_outputs + the original query into one
-coherent, cited final answer. This is the one agent that uses the LARGE
-model — everything upstream (retrieval, planning, tool dispatch) can run on
-the small model, but the final answer quality is what a judge actually
-reads, so it gets the bigger model. This is the other half of the mixed
-model-routing optimization story.
-
-TODO (next pass):
-- Real citation formatting (map answer claims back to retrieved_chunks/tool
-  sources)
-- Handle the case where tool_outputs or retrieved_chunks are empty/failed
-  gracefully instead of hallucinating
 """
 
 from typing import Any, AsyncIterator
@@ -41,13 +28,16 @@ class SynthesizerAgent(BaseAgent):
             detail="Calling large model to compose answer",
         )
 
-        context_str = "\n".join([c["text"] for c in chunks] + [str(t) for t in tool_outputs])
+        context_str = self._build_context(chunks, tool_outputs)
 
-        # TODO: real synthesis prompt with citation instructions
         result = await llm_client.generate(
-            prompt=f"Query: {query}\n\nContext:\n{context_str}\n\nAnswer:",
+            prompt=f"Query: {query}\n\n{context_str}\n\nAnswer the query directly, using the "
+                   f"context above. If a tool's exact output is given, report that exact value "
+                   f"rather than recalculating or guessing.",
             size="large",
-            system="You are a research assistant. Answer using only the given context. Cite sources.",
+            system="You are a research assistant. Answer using only the given context. "
+                   "Never invent facts or code that isn't in the context. Cite sources "
+                   "by name when using retrieved document chunks.",
         )
 
         yield AgentEvent(
@@ -63,3 +53,35 @@ class SynthesizerAgent(BaseAgent):
             latency_seconds=result.latency_seconds,
             tokens_per_second=result.tokens_per_second,
         )
+
+    def _build_context(self, chunks: list[dict], tool_outputs: list[dict]) -> str:
+        parts = []
+
+        if chunks:
+            parts.append("=== Retrieved document chunks ===")
+            for c in chunks:
+                source = c.get("source", "unknown")
+                parts.append(f"[Source: {source}]\n{c['text']}")
+
+        for t in tool_outputs:
+            tool_name = t.get("tool", "unknown")
+            if t.get("error"):
+                parts.append(f"=== Tool: {tool_name} (FAILED) ===\nError: {t['error']}")
+                continue
+
+            result = t.get("result")
+            if tool_name == "code_exec" and isinstance(result, dict):
+                parts.append(
+                    f"=== Tool: code_exec (executed successfully) ===\n"
+                    f"stdout: {result.get('stdout', '').strip()}\n"
+                    f"stderr: {result.get('stderr', '').strip()}\n"
+                    f"exit_code: {result.get('exit_code')}"
+                )
+            elif tool_name == "web_search" and isinstance(result, list):
+                parts.append("=== Tool: web_search results ===")
+                for r in result:
+                    parts.append(f"- {r.get('title', '')}: {r.get('snippet', '')} ({r.get('url', '')})")
+            else:
+                parts.append(f"=== Tool: {tool_name} ===\n{result}")
+
+        return "\n\n".join(parts) if parts else "No context retrieved."

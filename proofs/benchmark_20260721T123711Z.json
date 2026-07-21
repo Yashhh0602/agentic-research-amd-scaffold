@@ -1,0 +1,276 @@
+{
+  "query": "What's the difference in memory coherence in HIP, and what's 47 times 89?",
+  "runs_per_mode": 5,
+  "timestamp_utc": "20260721T123711Z",
+  "rocm_smi_before": null,
+  "sequential": [
+    {
+      "mode": "sequential",
+      "total_latency_seconds": 7.913,
+      "agents": [
+        {
+          "agent": "retriever",
+          "latency_seconds": 0.0,
+          "tokens_per_second": null
+        },
+        {
+          "agent": "reasoning",
+          "latency_seconds": 1.579,
+          "tokens_per_second": 22.8
+        },
+        {
+          "agent": "executor",
+          "latency_seconds": 0.0,
+          "tokens_per_second": null
+        },
+        {
+          "agent": "synthesizer",
+          "latency_seconds": 3.59,
+          "tokens_per_second": 29.25
+        }
+      ]
+    },
+    {
+      "mode": "sequential",
+      "total_latency_seconds": 5.81,
+      "agents": [
+        {
+          "agent": "retriever",
+          "latency_seconds": 0.0,
+          "tokens_per_second": null
+        },
+        {
+          "agent": "reasoning",
+          "latency_seconds": 1.087,
+          "tokens_per_second": 27.59
+        },
+        {
+          "agent": "executor",
+          "latency_seconds": 0.0,
+          "tokens_per_second": null
+        },
+        {
+          "agent": "synthesizer",
+          "latency_seconds": 2.9,
+          "tokens_per_second": 30.69
+        }
+      ]
+    },
+    {
+      "mode": "sequential",
+      "total_latency_seconds": 6.41,
+      "agents": [
+        {
+          "agent": "retriever",
+          "latency_seconds": 0.0,
+          "tokens_per_second": null
+        },
+        {
+          "agent": "reasoning",
+          "latency_seconds": 1.15,
+          "tokens_per_second": 28.69
+        },
+        {
+          "agent": "executor",
+          "latency_seconds": 0.0,
+          "tokens_per_second": null
+        },
+        {
+          "agent": "synthesizer",
+          "latency_seconds": 3.706,
+          "tokens_per_second": 32.65
+        }
+      ]
+    },
+    {
+      "mode": "sequential",
+      "total_latency_seconds": 5.676,
+      "agents": [
+        {
+          "agent": "retriever",
+          "latency_seconds": 0.0,
+          "tokens_per_second": null
+        },
+        {
+          "agent": "reasoning",
+          "latency_seconds": 1.181,
+          "tokens_per_second": 27.94
+        },
+        {
+          "agent": "executor",
+          "latency_seconds": 0.0,
+          "tokens_per_second": null
+        },
+        {
+          "agent": "synthesizer",
+          "latency_seconds": 2.931,
+          "tokens_per_second": 34.46
+        }
+      ]
+    },
+    {
+      "mode": "sequential",
+      "total_latency_seconds": 6.214,
+      "agents": [
+        {
+          "agent": "retriever",
+          "latency_seconds": 0.0,
+          "tokens_per_second": null
+        },
+        {
+          "agent": "reasoning",
+          "latency_seconds": 1.564,
+          "tokens_per_second": 23.01
+        },
+        {
+          "agent": "executor",
+          "latency_seconds": 0.0,
+          "tokens_per_second": null
+        },
+        {
+          "agent": "synthesizer",
+          "latency_seconds": 3.047,
+          "tokens_per_second": 35.12
+        }
+      ]
+    }
+  ],
+  "concurrent": [
+    {
+      "mode": "concurrent",
+      "total_latency_seconds": 6.324,
+      "agents": [
+        {
+          "agent": "retriever",
+          "latency_seconds": 0.0,
+          "tokens_per_second": null
+        },
+        {
+          "agent": "reasoning",
+          "latency_seconds": 1.464,
+          "tokens_per_second": 31.41
+        },
+        {
+          "agent": "executor",
+          "latency_seconds": 0.0,
+          "tokens_per_second": null
+        },
+        {
+          "agent": "synthesizer",
+          "latency_seconds": 3.197,
+          "tokens_per_second": 31.59
+        }
+      ]
+    },
+    {
+      "mode": "concurrent",
+      "total_latency_seconds": 8.071,
+      "agents": [
+        {
+          "agent": "retriever",
+          "latency_seconds": 0.0,
+          "tokens_per_second": null
+        },
+        {
+          "agent": "reasoning",
+          "latency_seconds": 1.615,
+          "tokens_per_second": 32.19
+        },
+        {
+          "agent": "executor",
+          "latency_seconds": 0.0,
+          "tokens_per_second": null
+        },
+        {
+          "agent": "synthesizer",
+          "latency_seconds": 5.075,
+          "tokens_per_second": 34.09
+        }
+      ]
+    },
+    {
+      "mode": "concurrent",
+      "total_latency_seconds": 7.137,
+      "agents": [
+        {
+          "agent": "retriever",
+          "latency_seconds": 0.0,
+          "tokens_per_second": null
+        },
+        {
+          "agent": "reasoning",
+          "latency_seconds": 1.459,
+          "tokens_per_second": 31.52
+        },
+        {
+          "agent": "executor",
+          "latency_seconds": 0.0,
+          "tokens_per_second": null
+        },
+        {
+          "agent": "synthesizer",
+          "latency_seconds": 4.222,
+          "tokens_per_second": 36.48
+        }
+      ]
+    },
+    {
+      "mode": "concurrent",
+      "total_latency_seconds": 7.119,
+      "agents": [
+        {
+          "agent": "retriever",
+          "latency_seconds": 0.0,
+          "tokens_per_second": null
+        },
+        {
+          "agent": "reasoning",
+          "latency_seconds": 1.759,
+          "tokens_per_second": 26.15
+        },
+        {
+          "agent": "executor",
+          "latency_seconds": 0.0,
+          "tokens_per_second": null
+        },
+        {
+          "agent": "synthesizer",
+          "latency_seconds": 3.735,
+          "tokens_per_second": 32.13
+        }
+      ]
+    },
+    {
+      "mode": "concurrent",
+      "total_latency_seconds": 7.643,
+      "agents": [
+        {
+          "agent": "retriever",
+          "latency_seconds": 0.0,
+          "tokens_per_second": null
+        },
+        {
+          "agent": "reasoning",
+          "latency_seconds": 1.605,
+          "tokens_per_second": 32.41
+        },
+        {
+          "agent": "executor",
+          "latency_seconds": 0.0,
+          "tokens_per_second": null
+        },
+        {
+          "agent": "synthesizer",
+          "latency_seconds": 4.029,
+          "tokens_per_second": 33.51
+        }
+      ]
+    }
+  ],
+  "rocm_smi_after": null,
+  "sequential_mean_seconds": 6.405,
+  "sequential_stdev_seconds": 0.894,
+  "concurrent_mean_seconds": 7.259,
+  "concurrent_stdev_seconds": 0.655,
+  "speedup_factor": 0.88
+}

@@ -18,6 +18,7 @@ from typing import Any, AsyncIterator
 
 from app.agents.base import AgentEvent, AgentResult, BaseAgent, EventType
 from app.tools.web_search import web_search
+from app.tools.code_exec import execute_code
 
 
 class ExecutorAgent(BaseAgent):
@@ -62,19 +63,22 @@ class ExecutorAgent(BaseAgent):
                 event_type=EventType.TOOL_CALL,
                 detail="code_exec",
             )
-            # TODO: replace with real app/tools/code_exec.py call (needs sandboxing first)
-            tool_outputs.append({"tool": "code_exec", "result": "[placeholder code output]"})
-            yield AgentEvent(
-                agent_name=self.name,
-                event_type=EventType.TOOL_RESULT,
-                detail="code_exec finished",
-            )
-
-        yield AgentEvent(
-            agent_name=self.name,
-            event_type=EventType.FINISHED,
-            detail=f"Ran {len(tool_outputs)} tool(s)",
-        )
+            try:
+                code = plan.get("code", "")
+                exec_result = await execute_code(code)
+                tool_outputs.append({"tool": "code_exec", "result": exec_result})
+                yield AgentEvent(
+                    agent_name=self.name,
+                    event_type=EventType.TOOL_RESULT,
+                    detail=f"code_exec finished (exit_code={exec_result['exit_code']})",
+                )
+            except Exception as e:
+                tool_outputs.append({"tool": "code_exec", "result": None, "error": str(e)})
+                yield AgentEvent(
+                    agent_name=self.name,
+                    event_type=EventType.ERROR,
+                    detail=f"code_exec failed: {e}",
+                )
 
         context["tool_outputs"] = tool_outputs
         yield AgentResult(agent_name=self.name, output=tool_outputs, latency_seconds=0.0)

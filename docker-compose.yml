@@ -1,5 +1,3 @@
-version: "3.9"
-
 services:
   postgres:
     image: pgvector/pgvector:pg16
@@ -29,7 +27,6 @@ services:
       timeout: 5s
       retries: 10
 
-  
   backend:
     build: ./backend
     container_name: ara_backend
@@ -39,22 +36,23 @@ services:
         condition: service_healthy
       redis:
         condition: service_healthy
-      
     ports:
       - "8000:8000"
     volumes:
       - ./backend/app:/app/app
-
   frontend:
     build: ./frontend
     container_name: ara_frontend
     depends_on:
       - backend
     ports:
-      - "3000:3000"
+      - "3001:3000"
     environment:
       - NEXT_PUBLIC_API_URL=http://localhost:8000
+      - NEXT_PUBLIC_WS_URL=ws://localhost:8000/api/query/stream
+    volumes:
+      - ./frontend:/app
+      - /app/node_modules
 
 volumes:
   pgdata:
-  
