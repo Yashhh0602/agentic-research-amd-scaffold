@@ -1,0 +1,56 @@
+{
+  "num_queries": 5,
+  "timestamp_utc": "20260721T195739Z",
+  "rocm_smi_snapshot": "\n\n============================ ROCm System Management Interface ============================\n=================================== % time GPU is busy ===================================\nGPU[0]\t\t: GPU use (%): 4\n==========================================================================================\n=================================== Current Memory Use ===================================\nGPU[0]\t\t: GPU Memory Allocated (VRAM%): 91\nGPU[0]\t\t: GPU Memory Read/Write Activity (%): 0\nGPU[0]\t\t: Memory Activity: N/A\nGPU[0]\t\t: Avg. Memory Bandwidth: 0\n==========================================================================================\n================================== End of ROCm SMI Log ===================================\n",
+  "one_at_a_time": {
+    "total_wall_seconds": 68.793,
+    "per_query": [
+      {
+        "query": "What are the differences between ROCm's memory model and CUDA's, and what changes are needed to port a CUDA kernel to HIP?",
+        "latency_seconds": 21.688
+      },
+      {
+        "query": "What is coarse-grained versus fine-grained memory coherence in HIP?",
+        "latency_seconds": 9.344
+      },
+      {
+        "query": "How does unified memory management work in HIP?",
+        "latency_seconds": 8.212
+      },
+      {
+        "query": "What are the basic steps to port a CUDA kernel to HIP?",
+        "latency_seconds": 14.285
+      },
+      {
+        "query": "Explain HIP's virtual memory management API.",
+        "latency_seconds": 15.264
+      }
+    ]
+  },
+  "concurrent_batch": {
+    "total_wall_seconds": 27.11,
+    "per_query": [
+      {
+        "query": "What are the differences between ROCm's memory model and CUDA's, and what changes are needed to port a CUDA kernel to HIP?",
+        "latency_seconds": 25.567
+      },
+      {
+        "query": "What is coarse-grained versus fine-grained memory coherence in HIP?",
+        "latency_seconds": 25.079
+      },
+      {
+        "query": "How does unified memory management work in HIP?",
+        "latency_seconds": 7.47
+      },
+      {
+        "query": "What are the basic steps to port a CUDA kernel to HIP?",
+        "latency_seconds": 25.723
+      },
+      {
+        "query": "Explain HIP's virtual memory management API.",
+        "latency_seconds": 27.106
+      }
+    ]
+  },
+  "throughput_speedup_factor": 2.54
+}
