@@ -19,6 +19,7 @@ class Settings(BaseSettings):
     ollama_large_model: str = "qwen2.5:7b"
 
     vllm_base_url: str = "http://localhost:8000/v1"
+    vllm_large_base_url: str = "http://localhost:8000/v1"
     vllm_api_key: str = "not-needed"
     vllm_small_model: str = "Qwen/Qwen2.5-3B-Instruct"
     vllm_large_model: str = "Qwen/Qwen2.5-14B-Instruct"

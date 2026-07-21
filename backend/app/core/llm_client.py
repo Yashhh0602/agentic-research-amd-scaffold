@@ -40,12 +40,17 @@ class GenerationResult:
 class LLMClient:
     def __init__(self) -> None:
         self.backend = settings.llm_backend
-        self._client = httpx.AsyncClient(timeout=120.0)
+        self._client = httpx.AsyncClient(timeout=300.0)
 
     def _model_name(self, size: ModelSize) -> str:
         if self.backend == "vllm":
             return settings.vllm_small_model if size == "small" else settings.vllm_large_model
         return settings.ollama_small_model if size == "small" else settings.ollama_large_model
+
+    def _vllm_base_url(self, size: ModelSize) -> str:
+        if size == "large":
+            return settings.vllm_large_base_url
+        return settings.vllm_base_url
 
     async def generate(
         self,
@@ -59,7 +64,7 @@ class LLMClient:
         start = time.perf_counter()
 
         if self.backend == "vllm":
-            result = await self._generate_vllm(model, prompt, system, temperature, max_tokens)
+            result = await self._generate_vllm(model, prompt, system, temperature, max_tokens, size)
         else:
             result = await self._generate_ollama(model, prompt, system, temperature, max_tokens)
 
@@ -87,7 +92,7 @@ class LLMClient:
             prompt_tokens=data.get("prompt_eval_count"),
             completion_tokens=data.get("eval_count"),
         )
-    
+
     async def embed(self, text: str) -> list[float]:
         """Embeddings only make sense against Ollama's local embedding model
         for now — vLLM embedding routing can be added later if needed."""
@@ -99,7 +104,8 @@ class LLMClient:
         return resp.json()["embedding"]
 
     async def _generate_vllm(
-        self, model: str, prompt: str, system: str | None, temperature: float, max_tokens: int
+        self, model: str, prompt: str, system: str | None, temperature: float, max_tokens: int,
+        size: ModelSize = "small",
     ) -> GenerationResult:
         messages = []
         if system:
@@ -113,8 +119,9 @@ class LLMClient:
             "max_tokens": max_tokens,
         }
         headers = {"Authorization": f"Bearer {settings.vllm_api_key}"}
+        base_url = self._vllm_base_url(size)
         resp = await self._client.post(
-            f"{settings.vllm_base_url}/chat/completions", json=payload, headers=headers
+            f"{base_url}/chat/completions", json=payload, headers=headers
         )
         resp.raise_for_status()
         data = resp.json()

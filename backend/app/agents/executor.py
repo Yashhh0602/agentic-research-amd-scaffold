@@ -7,13 +7,11 @@ need an LLM call itself for simple tool dispatch, but may use the small
 model to interpret tool output before handing it to the Synthesizer.
 
 TODO (next pass):
-- Wire real tool call for code_exec.py (still placeholder, needs sandboxing)
 - Support parallel tool calls when the plan has independent sub-tasks
   (this matters for the concurrent execution mode / benchmark story)
-- Error handling: a failed tool call shouldn't kill the whole pipeline,
-  should degrade gracefully and let Synthesizer know what's missing
 """
 
+import time
 from typing import Any, AsyncIterator
 
 from app.agents.base import AgentEvent, AgentResult, BaseAgent, EventType
@@ -26,6 +24,7 @@ class ExecutorAgent(BaseAgent):
 
     async def run(self, context: dict[str, Any]) -> AsyncIterator[AgentEvent | AgentResult]:
         plan = context.get("plan", {})
+        start = time.perf_counter()
 
         yield AgentEvent(
             agent_name=self.name,
@@ -80,5 +79,6 @@ class ExecutorAgent(BaseAgent):
                     detail=f"code_exec failed: {e}",
                 )
 
+        elapsed = time.perf_counter() - start
         context["tool_outputs"] = tool_outputs
-        yield AgentResult(agent_name=self.name, output=tool_outputs, latency_seconds=0.0)
+        yield AgentResult(agent_name=self.name, output=tool_outputs, latency_seconds=elapsed)

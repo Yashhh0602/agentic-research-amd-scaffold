@@ -31,13 +31,25 @@ class SynthesizerAgent(BaseAgent):
         context_str = self._build_context(chunks, tool_outputs)
 
         result = await llm_client.generate(
-            prompt=f"Query: {query}\n\n{context_str}\n\nAnswer the query directly, using the "
-                   f"context above. If a tool's exact output is given, report that exact value "
-                   f"rather than recalculating or guessing.",
+            prompt=f"Query: {query}\n\n{context_str}\n\n"
+                   f"Answer the query using ONLY the context above. For every factual "
+                   f"statement you make, you MUST end that sentence with a citation tag "
+                   f"indicating exactly where it came from, in this format: "
+                   f"[Source: <source name>] for document chunks, or [Tool: <tool name>] "
+                   f"for tool output. If you cannot attach a real citation tag to a "
+                   f"statement, do not make that statement at all, even if you believe it "
+                   f"is true from general knowledge. If the context does not cover part of "
+                   f"the query, write one sentence saying so explicitly, uncited, rather "
+                   f"than answering that part yourself. If a tool's exact output is given, "
+                   f"report that exact value rather than recalculating or guessing.",
             size="large",
-            system="You are a research assistant. Answer using only the given context. "
-                   "Never invent facts or code that isn't in the context. Cite sources "
-                   "by name when using retrieved document chunks.",
+            system="You are a research assistant restricted to a closed-book context. "
+                   "Every factual sentence you write must carry a [Source: ...] or "
+                   "[Tool: ...] citation tag naming where it came from. A sentence with "
+                   "no citation tag is only allowed if it is explicitly stating that the "
+                   "context does not cover something. You must not use any knowledge "
+                   "outside the given context, even if you are confident it is correct.",
+            temperature=0.1,
         )
 
         yield AgentEvent(
