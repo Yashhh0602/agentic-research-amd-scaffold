@@ -94,17 +94,40 @@ Backend health check: `http://localhost:8000/health`
 
 ## Benchmarks
 
-Run the benchmark script against a live vLLM endpoint (real GPU numbers, not CPU):
+Run the benchmark scripts against a live vLLM endpoint on the AMD ROCm pod:
 
 ```bash
 python scripts/benchmark.py --query "<hero query>" --runs 5
+python scripts/throughput_benchmark.py --queries 5
 ```
 
 Results are logged to `proofs/` as timestamped JSON, including `rocm-smi` output where available, so numbers here are reproducible, not hand-typed.
 
-**GPU (ROCm/vLLM) results:** pending — pod benchmark run in progress, will be filled in once complete.
+### Throughput under concurrent load: 2.54x
 
-**CPU (local, Ollama) baseline for reference:** sequential mean 6.581s vs concurrent mean 5.641s (1.17x speedup). This is a CPU-only sanity check confirming the concurrent orchestration logic works correctly; it is not the ROCm optimization claim — see the GPU results above for that.
+The strongest result: **5 different users asking 5 different questions simultaneously**, one-at-a-time vs all fired concurrently at the same vLLM endpoint.
+
+| | Total time (5 queries) |
+|---|---|
+| One-at-a-time | 68.793s |
+| Concurrent batch | 27.11s |
+| **Speedup** | **2.54x** |
+
+Being direct about what this does and doesn't show: individual query latency for any single user was not faster under concurrent load (in fact slightly worse for some queries, e.g. one query went from 21.7s solo to 25.6s concurrent) — that's expected, since GPU compute is shared across simultaneous requests. What improved is total system throughput: how many different users' questions this pipeline can serve per minute. That's the metric that matters for real deployment, where multiple people query the assistant at once rather than one person waiting alone. This result reflects vLLM's continuous batching doing real work on ROCm, not the multi-agent orchestration itself.
+
+### Agent-level orchestration: sequential vs concurrent, 1.19x
+
+Same query, same hardware, comparing the orchestrator's two execution modes (see Architecture above): Retriever+Reasoning running in parallel vs strictly one after another.
+
+| | Mean total latency (5 runs) |
+|---|---|
+| Sequential | 13.184s |
+| Concurrent | 11.09s |
+| **Speedup** | **1.19x** |
+
+This number is smaller than the throughput result, and that's expected, not a weak result to downplay: agent-level concurrency is bounded by real dependencies (Executor genuinely needs Reasoning's plan before it can start, Synthesizer genuinely needs everything). Only two of four agents (Retriever, Reasoning) have no dependency on each other, so there's a hard ceiling on how much this specific optimization can win by design, not by implementation gap. The two benchmarks together tell an honest story: orchestration-level concurrency gets a modest, dependency-bounded win, while request-level concurrency (multiple users) is where vLLM's batching shows its real strength.
+
+**CPU (local, Ollama) baseline for reference:** sequential mean 6.581s vs concurrent mean 5.641s (1.17x speedup), consistent with the GPU agent-level result above. This was a pre-pod sanity check confirming the orchestration logic itself was correct before spending GPU-hours on it.
 
 ## Known limitations
 
