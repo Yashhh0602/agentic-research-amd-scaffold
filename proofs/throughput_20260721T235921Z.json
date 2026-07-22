@@ -1,0 +1,56 @@
+{
+  "num_queries": 5,
+  "timestamp_utc": "20260721T235921Z",
+  "rocm_smi_snapshot": null,
+  "one_at_a_time": {
+    "total_wall_seconds": 125.598,
+    "per_query": [
+      {
+        "query": "What are the differences between ROCm's memory model and CUDA's, and what changes are needed to port a CUDA kernel to HIP?",
+        "latency_seconds": 18.934
+      },
+      {
+        "query": "What is coarse-grained versus fine-grained memory coherence in HIP?",
+        "latency_seconds": 20.716
+      },
+      {
+        "query": "How does unified memory management work in HIP?",
+        "latency_seconds": 22.441
+      },
+      {
+        "query": "What are the basic steps to port a CUDA kernel to HIP?",
+        "latency_seconds": 36.609
+      },
+      {
+        "query": "Explain HIP's virtual memory management API.",
+        "latency_seconds": 26.896
+      }
+    ]
+  },
+  "concurrent_batch": {
+    "total_wall_seconds": 30.82,
+    "per_query": [
+      {
+        "query": "What are the differences between ROCm's memory model and CUDA's, and what changes are needed to port a CUDA kernel to HIP?",
+        "latency_seconds": 22.864
+      },
+      {
+        "query": "What is coarse-grained versus fine-grained memory coherence in HIP?",
+        "latency_seconds": 24.299
+      },
+      {
+        "query": "How does unified memory management work in HIP?",
+        "latency_seconds": 24.174
+      },
+      {
+        "query": "What are the basic steps to port a CUDA kernel to HIP?",
+        "latency_seconds": 19.426
+      },
+      {
+        "query": "Explain HIP's virtual memory management API.",
+        "latency_seconds": 30.816
+      }
+    ]
+  },
+  "throughput_speedup_factor": 4.08
+}
