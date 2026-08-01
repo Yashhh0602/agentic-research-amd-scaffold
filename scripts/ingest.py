@@ -84,7 +84,6 @@ def main():
 
     engine = create_engine(SYNC_DB_URL)
 
-    # create table if missing, matches db/models.py DocumentChunk schema
     with engine.begin() as conn:
         conn.execute(text("""
             CREATE TABLE IF NOT EXISTS document_chunks (
@@ -97,8 +96,6 @@ def main():
 
     total_chunks = 0
     with Session(engine) as session:
-        total_chunks = 0
-    with Session(engine) as session:
         for url in SOURCES:
             existing = session.execute(
                 text("SELECT COUNT(*) FROM document_chunks WHERE source = :source"),
@@ -108,13 +105,6 @@ def main():
                 print(f"Skipping {url} ({existing} chunks already exist)")
                 continue
 
-            print(f"Fetching {url}")
-            try:
-                page_text = fetch_and_clean(url)
-            except Exception as e:
-                print(f"  FAILED to fetch: {e}")
-                continue
-        for url in SOURCES:
             print(f"Fetching {url}")
             try:
                 page_text = fetch_and_clean(url)
@@ -138,7 +128,7 @@ def main():
 
         session.commit()
 
-    print(f"Done. Ingested {total_chunks} chunks from {len(SOURCES)} sources.")
+    print(f"Done. Ingested {total_chunks} new chunk(s) across sources.")
 
 
 if __name__ == "__main__":

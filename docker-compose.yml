@@ -31,6 +31,8 @@ services:
     build: ./backend
     container_name: ara_backend
     env_file: .env
+    environment:
+      - DATABASE_URL=postgresql+asyncpg://ara:ara_dev_pw@postgres:5432/ara_db
     depends_on:
       postgres:
         condition: service_healthy
