@@ -40,6 +40,8 @@ Reasoning ─┘
 
 This is the core benchmark: same query, same hardware, sequential vs concurrent execution mode, real wall-clock time and GPU utilization compared. The mode is a live toggle in the UI, not just a config flag, so it can be demonstrated directly.
 
+![Concurrent mode trace panel](docs/screenshots/trace_concurrent.png)
+
 **Second optimization: mixed model-size routing.** Reasoning (routing/planning) runs on a small 3B model (`Qwen2.5-3B-Instruct`). Synthesizer, which produces the actual answer a user reads, runs on a larger 7B model (`Qwen2.5-7B-Instruct-AWQ`) served as a second, independent vLLM process on the same GPU. This isn't just a config label — it's two separate model processes, each with its own memory allocation (`--gpu-memory-utilization 0.25` for the 3B, `0.5` for the 7B), routed to by size in `llm_client.py`. This mattered in practice, not just in theory: an earlier version routed both sizes to the same 3B model, and Synthesizer introduced ungrounded facts not present in retrieved context in roughly half of repeated test runs on the same query. Retrieval itself was independently verified correct; the issue was a model capability ceiling. Switching Synthesizer to the 7B model fixed it — see Known limitations for the full before/after.
 
 ### Stack
@@ -104,6 +106,8 @@ python scripts/throughput_benchmark.py --queries 5
 ```
 
 Results are logged to `proofs/` as timestamped JSON, including `rocm-smi` output where available, so numbers here are reproducible, not hand-typed.
+
+![Final answer with real citations](docs/screenshots/answer.png)
 
 ### Throughput under concurrent load: 4.08x
 
