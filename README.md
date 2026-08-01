@@ -144,6 +144,7 @@ Being direct about what this is and isn't:
 - Local models (3B/7B class) are not frontier-model quality. The value proposition here is deployability, cost, and data privacy for an on-prem research assistant, not raw reasoning capability competing with hosted frontier models.
 - GPU access for this project was constrained to a limited hackathon credit allocation, which shaped how benchmark sessions were structured — deliberate short, focused runs rather than long exploratory sessions.
 - `code_exec` sandboxing uses subprocess + resource limits, not full container isolation. Sufficient for this scope, not something to expose to untrusted input in production without further hardening.
+- Each query is currently stateless by design — the project's scope prioritized the orchestration and benchmarking story (sequential vs concurrent execution, mixed model routing) over conversational features. Multi-turn memory (session-based conversation history passed into the Reasoning agent's context, backed by the Redis instance already running in the stack) is a natural next extension, not something ruled out by the architecture.
 
 ## Project structure
 
