@@ -4,6 +4,8 @@ A multi-agent research assistant built for the AMD AI DevMaster Hackathon (Track
 
 Built for [AMD AI DevMaster Hackathon](https://lu.ma/amd-ai-devmaster), submission deadline Aug 6, 2026.
 
+🎥 **Demo video:** https://youtu.be/Qql5R5Qa7Eo
+
 ## Why this exists
 
 Most agentic demos show one model doing plan → tool → observe → answer in a loop. This project asks a different question: **what happens when you have multiple agents with genuinely different jobs, and you have to decide how they share a GPU?**
